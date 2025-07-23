@@ -1,7 +1,13 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { StateVectorRow } from "@/types/simulation";
+import { Button } from "@/components/ui/button";
+import type { StateVectorRow, SimulationConfig } from "@/types/simulation";
 import { cn } from "@/lib/utils";
+import {
+  avanzarSimulacion,
+  inicializarSimulacion,
+  establecerNumerosRandom,
+} from "@/services/simulacion";
 
 interface HeaderColumn {
   name: string;
@@ -19,6 +25,7 @@ interface HeaderColumn {
 
 interface StateVectorTableProps {
   numberOfTanks?: number;
+  simulationConfig?: SimulationConfig;
 }
 
 const headersData: Omit<HeaderColumn, "width" | "left">[] = [
@@ -128,53 +135,73 @@ const COLUMN_WIDTHS = [100, 120, 150];
 
 export default function StateVectorTable({
   numberOfTanks = 5,
+  simulationConfig,
 }: StateVectorTableProps) {
-  const exampleData: StateVectorRow[] = useMemo(() => {
-    const data: StateVectorRow[] = [];
-    for (let i = 1; i <= 50; i++) {
-      data.push({
-        eventNumber: i,
-        clockTime: (i - 1) * 0.5,
-        eventType:
-          i === 1
-            ? "Llegada buque"
-            : i % 3 === 0
-              ? "Fin bombeo"
-              : "Llegada buque",
-        arrivalRnd: Math.round(Math.random() * 99) / 100,
-        arrivalTime: 0.8 + Math.random() * 2,
-        nextArrival: (i - 1) * 0.5 + 0.8 + Math.random() * 2,
-        loadRnd: Math.round(Math.random() * 99) / 100,
-        loadTonnage: [15000, 20000, 25000][Math.floor(Math.random() * 3)],
-        pumpTime: 1.5 + Math.random() * 1,
-        realPumpTime: 2.0 + Math.random() * 1,
-        finalPumpTime: (i - 1) * 0.5 + 2.0 + Math.random() * 1,
-        remainingLoad: 45000 + Math.random() * 25000,
-        finalTime: (i - 1) * 0.5 + 3.0 + Math.random() * 2,
-        dischargeRemainingLoad: 60000 + Math.random() * 10000,
-        finalDischargeTime: (i - 1) * 0.5 + 15 + Math.random() * 5,
-        tankFinalTimes: Array.from(
-          { length: numberOfTanks },
-          (_, tankIndex) => ({
-            tankNumber: tankIndex + 1,
-            remainingLoad: Math.random() * 70000,
-            finalTime: (i - 1) * 0.5 + Math.random() * 20,
-          }),
-        ),
-        totalDischargedTonnage: i * 18000 + Math.random() * 5000,
-        maxQueueLength: Math.min(i, 3),
-        coastalTanks: Array.from({ length: numberOfTanks }, (_, tankIndex) => ({
-          tankNumber: tankIndex + 1,
-          status: ["Libre", "Cargando", "Descargando"][
-            Math.floor(Math.random() * 3)
-          ],
-          remainingLoad: Math.random() * 70000,
-          loadingShip: tankIndex < 2 ? `B${i + tankIndex}` : "",
-        })),
-      });
+  const [simulationData, setSimulationData] = useState<StateVectorRow[]>([]);
+  const [isSimulationInitialized, setIsSimulationInitialized] = useState(false);
+
+  // Inicializar la simulación
+  useEffect(() => {
+    if (!isSimulationInitialized && simulationConfig) {
+      const { randomNumbers, initialConditions } = simulationConfig;
+
+      // Solo inicializar si tenemos números aleatorios válidos
+      if (
+        randomNumbers.arrivalNumbers.length > 0 &&
+        randomNumbers.loadNumbers.length > 0
+      ) {
+        // Pasar las condiciones iniciales al backend
+        inicializarSimulacion(numberOfTanks, initialConditions);
+
+        // Convertir números de 0-99 a 0-1
+        const llegadas = randomNumbers.arrivalNumbers.map((num) => num / 100);
+        const cargas = randomNumbers.loadNumbers.map((num) => num / 100);
+        establecerNumerosRandom(llegadas, cargas);
+
+        setIsSimulationInitialized(true);
+      }
     }
-    return data;
-  }, [numberOfTanks]);
+  }, [numberOfTanks, simulationConfig, isSimulationInitialized]);
+
+  // Función para avanzar un paso en la simulación
+  const avanzarPaso = () => {
+    try {
+      const nuevaFila = avanzarSimulacion();
+      setSimulationData((prev) => [...prev, nuevaFila]);
+    } catch (error) {
+      console.error("Error al avanzar simulación:", error);
+    }
+  };
+
+  // Función para avanzar múltiples pasos
+  const avanzarMultiplesPasos = (pasos: number) => {
+    const nuevasFilas: StateVectorRow[] = [];
+    for (let i = 0; i < pasos; i++) {
+      try {
+        const nuevaFila = avanzarSimulacion();
+        nuevasFilas.push(nuevaFila);
+      } catch (error) {
+        console.error(`Error al avanzar paso ${i + 1}:`, error);
+        break;
+      }
+    }
+    setSimulationData((prev) => [...prev, ...nuevasFilas]);
+  };
+
+  // Función para reiniciar la simulación
+  const reiniciarSimulacion = () => {
+    setSimulationData([]);
+    setIsSimulationInitialized(false);
+  };
+
+  // Usar los datos reales de la simulación en lugar de datos de ejemplo
+  const exampleData: StateVectorRow[] = simulationData;
+
+  // Verificar si la simulación está lista para ejecutarse
+  const canRunSimulation =
+    simulationConfig &&
+    simulationConfig.randomNumbers.arrivalNumbers.length > 0 &&
+    simulationConfig.randomNumbers.loadNumbers.length > 0;
 
   const { headerRows, bodyColumns } = useMemo(() => {
     const firstHeaderRow: HeaderColumn[] = [];
@@ -296,6 +323,49 @@ export default function StateVectorTable({
         <CardTitle className="font-sans">
           Vector de Estado - Simulación de Puerto
         </CardTitle>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button
+            onClick={avanzarPaso}
+            disabled={!isSimulationInitialized || !canRunSimulation}
+            variant="default"
+            size="sm"
+          >
+            Avanzar 1 Paso
+          </Button>
+          <Button
+            onClick={() => avanzarMultiplesPasos(5)}
+            disabled={!isSimulationInitialized || !canRunSimulation}
+            variant="outline"
+            size="sm"
+          >
+            Avanzar 5 Pasos
+          </Button>
+          <Button
+            onClick={() => avanzarMultiplesPasos(10)}
+            disabled={!isSimulationInitialized || !canRunSimulation}
+            variant="outline"
+            size="sm"
+          >
+            Avanzar 10 Pasos
+          </Button>
+          <Button
+            onClick={reiniciarSimulacion}
+            variant="destructive"
+            size="sm"
+            disabled={!canRunSimulation}
+          >
+            Reiniciar
+          </Button>
+          <div className="ml-auto text-sm text-muted-foreground">
+            Eventos: {simulationData.length} | Tanques: {numberOfTanks} |
+            Estado:{" "}
+            {!canRunSimulation
+              ? "Configuración incompleta"
+              : isSimulationInitialized
+                ? "Lista"
+                : "Cargando..."}
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="p-0">
         <div className="relative max-h-[80vh] overflow-auto rounded-lg border border-border">
@@ -329,29 +399,44 @@ export default function StateVectorTable({
               ))}
             </thead>
             <tbody>
-              {exampleData.map((row, rowIndex) => (
-                <tr key={`row-${rowIndex}`} className="hover:bg-muted/50">
-                  {bodyColumns.map((col, colIndex) => (
-                    <td
-                      key={`cell-${rowIndex}-${colIndex}`}
-                      className={cn(
-                        "border-r border-b bg-background p-2 text-center text-sm whitespace-nowrap",
-                        // Z-index más alto para columnas sticky y fondo sólido
-                        col.isSticky
-                          ? "sticky left-0 z-30 border-r-2 bg-background"
-                          : "z-10",
-                      )}
-                      style={{
-                        width: col.width,
-                        minWidth: col.width,
-                        left: col.left,
-                      }}
-                    >
-                      {formatValue(getCellValue(row, colIndex))}
-                    </td>
-                  ))}
+              {exampleData.length > 0 ? (
+                exampleData.map((row, rowIndex) => (
+                  <tr key={`row-${rowIndex}`} className="hover:bg-muted/50">
+                    {bodyColumns.map((col, colIndex) => (
+                      <td
+                        key={`cell-${rowIndex}-${colIndex}`}
+                        className={cn(
+                          "border-r border-b bg-background p-2 text-center text-sm whitespace-nowrap",
+                          // Z-index más alto para columnas sticky y fondo sólido
+                          col.isSticky
+                            ? "sticky left-0 z-30 border-r-2 bg-background"
+                            : "z-10",
+                        )}
+                        style={{
+                          width: col.width,
+                          minWidth: col.width,
+                          left: col.left,
+                        }}
+                      >
+                        {formatValue(getCellValue(row, colIndex))}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={bodyColumns.length}
+                    className="py-8 text-center text-muted-foreground"
+                  >
+                    {!canRunSimulation
+                      ? "Complete la configuración de números aleatorios en las pestañas superiores para poder ejecutar la simulación"
+                      : isSimulationInitialized
+                        ? "Presiona 'Avanzar 1 Paso' para comenzar la simulación"
+                        : "Inicializando simulación..."}
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

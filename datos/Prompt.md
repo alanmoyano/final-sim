@@ -21,3 +21,28 @@ Vamos a armar la tabla con el vector de estado, por ahora no vamos a ejecutar ni
 - Las primeras 3 columnas, también seran sticky, dado que estas tendran los datos principales para identificar un evento.
 - Dado que esta tabla debe parecerse lo máximo posible a una hecha con excel, en varios casos se harán 'títulos' para algunas columnas. Te adjunto fotos tanto de como se ve un ejemplo en excel y otro ejemplo ya hecho tablas en el frontend.
 - Por ahora, muestra siempre la tabla y genera algunos valores de ejemplo, estos seran usados unicamente para comprobar que la tabla se vea como quiero.
+
+---
+
+Vamos a implementar la lógica del trabajo práctico, lee el @Enunciado, también lee @Encabezados para entender un poco más sobre cada dato del vector de estados
+
+- La lógica deberas armarla en archivos distintos, idealmente en la carpeta @services, para calcular los valores necesarios en la distribución exponencial usa la función presente en el archivo @distribuciones
+- Investiga en internet sobre como se resuelven los problemas de este estilo, tienes como ejemplo el tp de https://github.com/BrisaDiaz/TP4_SIM, pero debes investigar más
+- Yo debo explicar el funcionamiento luego, asique no agregues comentarios innecesarios al código y asegurate de escribirlo de la manera más sencilla posible
+- No cometas errores ni produzcas alucinaciones
+- Si no comprendes algo, preguntame directamente
+
+Aclaraciones sobre el enunciado:
+
+- Ten en cuenta la 0,5 hora en el tiempo de bombeo
+- Para los números aleatorios necesarios, el frontend envía 2 listas, estas deberan ser usadas durante la ejecución en orden, cuando se te acaben los números, vuelve a empezar desde el primero, NO generes nuevos, reutiliza los dados
+- Utiliza acumuladores sencillos para contar la cantidad de Tn descargadas y el tamaño máximo de cola
+- Crea internamente los buques necesarios, especialmente para manejar el estado inicial de la simulación
+- Asigna los números de buque y muestra esos datos en la tabla
+
+Vas a analizar todo esto y formar un plan con pasos para poder resolver este problema.
+
+Es importante saber que para la presentación, se harán 1000 horas. Pero igualmente debes aceptar todos los parametros que te envia el formulario.
+Deberemos generar la lógica de la simulación, luego enviar estos datos para que se vean en la tabla y finalmente presentar en otra card abajo, las estadísticas pedidas (acumulador de Tn y tamaño máximo de cola)
+
+Ahora: Investiga y entiende el problema y luego presenta tu plan de acción. NO implementes nada todavía.

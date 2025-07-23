@@ -163,10 +163,21 @@ export default function SimulationConfig() {
   };
 
   const handleRunSimulation = () => {
+    // Validar que toda la configuración está completa
+    const isConfigComplete =
+      config.randomNumbers.arrivalNumbers.length > 0 &&
+      config.randomNumbers.loadNumbers.length > 0;
+
+    if (!isConfigComplete) {
+      toast.error(
+        "Complete todos los campos de configuración antes de ejecutar la simulación",
+      );
+      return;
+    }
+
     console.log("Configuración de simulación:", config);
-    // Aquí se ejecutaría la simulación en futuras iteraciones
-    alert(
-      "Configuración guardada. La simulación se ejecutará en la próxima iteración.",
+    toast.success(
+      "Simulación configurada correctamente. Use los controles debajo para avanzar paso a paso.",
     );
   };
 
@@ -812,7 +823,10 @@ export default function SimulationConfig() {
       </Card>
 
       {/* StateVectorTable moved below the execution button */}
-      <StateVectorTable numberOfTanks={parametersForm.watch("numberOfTanks")} />
+      <StateVectorTable
+        numberOfTanks={parametersForm.watch("numberOfTanks")}
+        simulationConfig={config}
+      />
     </div>
   );
 }
