@@ -1,0 +1,136 @@
+[
+  {
+    "name": "N° de evento",
+    "description": "El número de evento que ocurrió (cuenta desde 1)",
+  },
+  {
+    "name": "Reloj (horas)",
+    "description": "La hora actual del sistema al ocurrir un evento (empieza en 0)",
+  },
+  {
+    "name": "Evento",
+    "description": "El tipo de evento que ocurrió",
+  },
+  {
+    "name": "Llegada buques tanque",
+    "description": "Un encabezado que reune todos a los datos relevantes para el cálculo de la llegada de los buques tanque",
+    "child": [
+      {
+        "name": "RND",
+        "description": "Un número aleatorio entre 0 y 1 para determinar la llegada",
+      },
+      {
+        "name": "Tiempo",
+        "description": "El tiempo calculado con la distribución exponencial negativa",
+      },
+      {
+        "name": "Próxima llegada",
+        "description": "El tiempo resultado de la suma del tiempo actual y el tiempo calculado con la distribución exponencial negativa",
+      },
+    ],
+  },
+  {
+    "name": "Carga buques tanques",
+    "description": "Un encabezado que reúne todos los datos relevantes para el proceso de carga de los buques tanque",
+    "child": [
+      {
+        "name": "RND",
+        "description": "Un número aleatorio entre 0 y 1 para determinar la carga",
+      },
+      {
+        "name": "Carga (Tn)",
+        "description": "La cantidad de carga en toneladas que transporta el buque tanque",
+      },
+      {
+        "name": "Tiempo bombeo",
+        "description": "El tiempo teórico de bombeo calculado en base a la carga",
+      },
+      {
+        "name": "Tiempo bombeo real",
+        "description": "El tiempo real de bombeo considerando la 0,5 hora de inicio del encendido de la bomba (siempre se debe sumar)",
+      },
+      {
+        "name": "Hora final bombeo",
+        "description": "La hora en que finaliza el proceso de bombeo",
+      },
+      {
+        "name": "Carga restante",
+        "description": "La cantidad de carga que queda en el tanque costero",
+      },
+      {
+        "name": "Hora fin",
+        "description": "La hora en que finaliza la operación actual del tanque",
+      },
+    ],
+  },
+  {
+    "name": "Descarga buque costero a refinería",
+    "description": "Un encabezado que reúne los datos relevantes para el proceso de descarga del buque costero hacia la refinería",
+    "child": [
+      {
+        "name": "Carga restante (Tn)",
+        "description": "La cantidad de carga que queda por descargar del buque costero",
+      },
+      {
+        "name": "Hora final descarga",
+        "description": "La hora en que finaliza el proceso de descarga del buque costero",
+      },
+    ],
+  },
+  {
+    "name": "Horas finales tanques costeros",
+    "description": "Un encabezado que reúne todas las horas finales de los tanques costeros",
+    "child": [
+      {
+        "name": "N°",
+        "description": "El número identificador del tanque costero",
+      },
+      {
+        "name": "Carga restante (Tn)",
+        "description": "La cantidad de carga que queda en el tanque costero",
+      },
+      {
+        "name": "Hora fin",
+        "description": "La hora en que finaliza la operación actual del tanque",
+      },
+    ],
+    "childRepeat": true, // Esto indica que esta columna se repetirá para cada tanque costero
+  },
+  {
+    "name": "Estadísticas",
+    "description": "Un encabezado que reúne las estadísticas de seguimiento del sistema de simulación",
+    "child": [
+      {
+        "name": "Tn descargadas total",
+        "description": "El total acumulado de toneladas descargadas en el sistema",
+      },
+      {
+        "name": "Cola máxima",
+        "description": "El número máximo de buques que han estado en cola simultaneamente",
+      },
+    ],
+  },
+  {
+    "name": "Tanques costeros",
+    "description": "Un encabezado que reúne la información del estado y contenido de los tanques costeros",
+    "child": [
+      {
+        "name": "N°",
+        "description": "El número identificador del tanque costero",
+      },
+      {
+        "name": "Estado",
+        "description": "El estado actual del tanque (ej: Descargándose, Libre, etc.)",
+      },
+      {
+        "name": "Carga restante (Tn)",
+        "description": "La cantidad de carga que queda en el tanque costero",
+      },
+      {
+        "name": "Buque que lo carga",
+        "description": "Identificador del buque que está cargando este tanque",
+      },
+    ],
+    "childRepeat": true, // Esto indica que esta columna se repetirá para cada tanque costero
+  },
+]

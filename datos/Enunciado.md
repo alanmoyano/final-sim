@@ -1,0 +1,5 @@
+Buques tanques arriban periódicamente a un puerto y descargan su carga en tanques costeros. Cuando un tanque costero se completa, el contenido es transferido automáticamente a la refinería. Mientras esta transferencia sucede, el tanque costero no puede ser llenado por el buque tanque. La tasa de llegadas de buques responde a una exponencial negativa de media 0,125 hs., el tiempo de encendido de bombas es una constante de 0,5 hs., la tasa de bombeo una constante de 10000 Tn por hora, la tasa de descarga es una constante de 4000 Tn por hora, la carga de los buques tanques es de 15000, 20000 o 25000 Tn con igual probabilidad, el volumen del tanque costero es de 70000 Tn.
+
+Correr el modelo para 1000 hs., ininterrumpidas con cinco tanques costeros. Tomar como condiciones iniciales que 2 tanques costeros están libres y vacíos. Uno está descargándose y se desocupará a la hora ocho y los otros dos están siendo cargados y se liberan a la hora 12 (con 45000 Tn libres) y hora 3,5 (con 25000 Tn libres) respectivamente. El primer buque tanque llega a la hora 0.
+
+Determinar la cantidad de Tn descargadas y el tamaño máximo de cola.
