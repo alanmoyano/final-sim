@@ -46,6 +46,7 @@ import {
   type SimulationConfig,
 } from "@/types/simulation";
 import { toast } from "sonner";
+import StateVectorTable from "./StateVectorTable";
 
 // Validation schemas
 const parametersSchema = z.object({
@@ -809,6 +810,9 @@ export default function SimulationConfig() {
           )}
         </CardContent>
       </Card>
+
+      {/* StateVectorTable moved below the execution button */}
+      <StateVectorTable numberOfTanks={parametersForm.watch("numberOfTanks")} />
     </div>
   );
 }

@@ -134,3 +134,47 @@ export const generateInitialTanks = (numberOfTanks: number): TankState[] => {
 
   return tanks;
 };
+
+// State vector interfaces for simulation table
+export interface StateVectorRow {
+  eventNumber: number;
+  clockTime: number;
+  eventType: string;
+
+  // Llegada buques tanque
+  arrivalRnd: number;
+  arrivalTime: number;
+  nextArrival: number;
+
+  // Carga buques tanques
+  loadRnd: number;
+  loadTonnage: number;
+  pumpTime: number;
+  realPumpTime: number;
+  finalPumpTime: number;
+  remainingLoad: number;
+  finalTime: number;
+
+  // Descarga buque costero a refinería
+  dischargeRemainingLoad: number;
+  finalDischargeTime: number;
+
+  // Horas finales tanques costeros (repeated for each tank)
+  tankFinalTimes: Array<{
+    tankNumber: number;
+    remainingLoad: number;
+    finalTime: number;
+  }>;
+
+  // Estadísticas
+  totalDischargedTonnage: number;
+  maxQueueLength: number;
+
+  // Tanques costeros (repeated for each tank)
+  coastalTanks: Array<{
+    tankNumber: number;
+    status: string;
+    remainingLoad: number;
+    loadingShip: string;
+  }>;
+}

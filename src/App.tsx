@@ -1,11 +1,11 @@
-import { Toaster } from "@/components/ui/sonner";
 import SimulationConfig from "./components/SimulationConfig";
+import { Toaster } from "sonner";
 
 export default function App() {
   return (
     <>
       <SimulationConfig />
-      <Toaster />
+      <Toaster position="top-right" />
     </>
   );
 }
